@@ -1,0 +1,30 @@
+name: Run Scripts
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-scripts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install csvkit
+        run: pip install csvkit
+
+      - name: Run extract_sprint.sh
+        run: bash ./extract_sprint.sh filename.csv sprint_value > output.csv
+
+      - name: Run send_slack_messages.sh
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        run: bash ./send_slack_messages.sh output.csv sprint_value $SLACK_TOKEN
